@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  plans        NutritionPlan[]
+  dailyLogs    DailyLog[]
+}
+
+model NutritionPlan {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  status     String   @default("active") // active/archived
+  planJson   Json
+  createdAt  DateTime @default(now())
+
+  @@index([userId, status])
+}
+
+model DailyLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime
+  weightKg  Float?
+  createdAt DateTime @default(now())
+
+  mealLogs  MealLog[]
+
+  @@unique([userId, date])
+}
+
+model MealLog {
+  id         String   @id @default(cuid())
+  dailyLogId String
+  dailyLog   DailyLog @relation(fields: [dailyLogId], references: [id])
+  mealIndex  Int
+  completed  Boolean  @default(false)
+
+  @@unique([dailyLogId, mealIndex])
+}
