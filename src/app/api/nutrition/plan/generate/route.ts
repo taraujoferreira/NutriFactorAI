@@ -22,6 +22,18 @@ const Body = z.object({
   allergies: z.array(z.string()).optional().default([]),
 });
 
+function ensureBaseQuantities(plan: any) {
+  for (const meal of plan.meals ?? []) {
+    for (const it of meal.items ?? []) {
+      if (typeof it.base_quantity_g !== "number") {
+        it.base_quantity_g = it.quantity_g;
+      }
+    }
+  }
+  return plan;
+}
+
+
 export async function POST(req: Request) {
   const userId = await getUserIdFromCookie();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -81,8 +93,14 @@ export async function POST(req: Request) {
       else throw new Error("LLM não devolveu JSON válido.");
     }
 
-    return PlanSchema.parse(parsed);
+    const plan = PlanSchema.parse(parsed);
+    ensureBaseQuantities(plan);
+    return plan;
+
+    
   }
+
+  
 
   // 3) Tentar gerar até 3 vezes (1 + 2 correções)
   let plan = await generatePlanFromLLM();
@@ -115,6 +133,17 @@ Devolve APENAS JSON válido (sem texto fora do JSON).
   // 4) Auto-fix de calorias (PRO): corrige quantidades para bater target
   const fixed = autoFixCalories(plan);
   plan = fixed.plan;
+  function ensureBaseQuantities(plan: any) {
+    for (const meal of plan.meals ?? []) {
+      for (const it of meal.items ?? []) {
+        if (typeof it.base_quantity_g !== "number") it.base_quantity_g = it.quantity_g;
+      }
+    }
+  }
+
+  ensureBaseQuantities(plan);
+
+
 
   // revalidar após auto-fix
   check = validatePlanFoods(plan);

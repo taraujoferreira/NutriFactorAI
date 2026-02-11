@@ -37,11 +37,11 @@ export function buildPlanPrompt(input: {
       "massa",
       "batata",
       "batata doce",
-      "pão integral",
-      "pão",
+      "pao integral",
+      "pao",
       "aveia",
       "banana",
-      "maçã",
+      "maca",
       "wrap/tortilha"
     ],
     fats: [
@@ -55,7 +55,7 @@ export function buildPlanPrompt(input: {
       "alface",
       "tomate",
       "cenoura",
-      "brócolos",
+      "brocolos",
       "espinafres",
       "courgette",
       "pepino",
@@ -66,11 +66,11 @@ export function buildPlanPrompt(input: {
 
   // blacklist curta para evitar “alucinações”
   const forbidden = [
-    "algodão",
-    "bola de algodão",
-    "sabão",
+    "algodao",
+    "bola de algodao",
+    "sabao",
     "detergente",
-    "plástico",
+    "plastico",
     "papel",
     "shampoo",
     "desinfetante",

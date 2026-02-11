@@ -27,10 +27,17 @@ export const PlanSchema = z.object({
       items: z.array(
         z.object({
           food: z.string(),
-          quantity_g: IntLike,
+          quantity_g: IntLike, // 👈 em vez de z.number().int()
+          base_quantity_g: IntLike.optional(), // 👈 em vez de z.number().int().optional()
           notes: z.string().optional().default(""),
         })
+      ).transform((items) =>
+        items.map((it) => ({
+          ...it,
+          base_quantity_g: typeof it.base_quantity_g === "number" ? it.base_quantity_g : it.quantity_g,
+        }))
       ),
+
       estimated_macros: z.object({
         kcal: IntLike,
         protein_g: IntLike,
